@@ -12,6 +12,20 @@
 
 using namespace std;
 
+enum Action
+{
+    ACTION_QUIT,
+    ACTION_REGISTER,
+    ACTION_LOGIN,
+    ACTION_SEND_FILE,
+    ACTION_VIEW_FILE,
+    ACITON_SEND_MSG,
+    ACTION_VIEW_MSG,
+    ACTION_REFRESH,
+    ACTION_PARSE_FAILURE,
+    ACTION_DUMMY 
+};
+
 class Client
 {
 public:
@@ -31,7 +45,6 @@ public:
     string get_msg_from_user(); // ends by "__END__" or something
     void show_message(string& msg); // literally just a print
     tuple<string, int> get_file_name(string& username); // get_name_from_list except the list is os.listdir(".")
-    void save_file(int sockfd, string& filesize, string& username, string& target_file);
     void parse_userlist(string& response, vector<string> &user_list);
 
     /* client_server.h */
@@ -43,8 +56,14 @@ public:
     void send_actual_file(int sockfd, string& username, string& filename);
     void send_actual_msg(int sockfd, string& target_user, string& user_message);
 
-private:
+    /* client.h */
+    Action get_action_start();
+    Action get_action_session();
+    int create_user_dir(string& /* username */);
+    void connect();
 
+private:
+    int _sockfd;
 };
 
 #endif /* client.h */
