@@ -1,5 +1,5 @@
 PKGFLAG   =
-EXTHDRS   = util.h
+EXTHDRS   = sha256.h
 
 include ../Makefile.in
 include ../Makefile.lib

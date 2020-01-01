@@ -1,9 +1,7 @@
 /****************************************************************************
-  FileName     [ main.cpp ]
+  FileName     [ main_client.cpp ]
   PackageName  [ main ]
   Synopsis     [ Define main() ]
-  Author       [ Chung-Yang (Ric) Huang ]
-  Copyright    [ Copyleft(c) 2007-present LaDs(III), GIEE, NTU, Taiwan ]
 ****************************************************************************/
 
 #include "util.h"
@@ -14,15 +12,15 @@ using namespace std;
 //----------------------------------------------------------------------
 //    Global cmd Manager
 //----------------------------------------------------------------------
-CmdParser* cmdMgr = new CmdParser("fraig> ");
+CmdParser* cmdMgr = new CmdParser("CNChatRoom");
 
 extern bool initCommonCmd();
-extern bool initCirCmd();
+extern bool initClientCmd();
 
 static void
 usage()
 {
-   cout << "Usage: cirTest [ -File < doFile > ]" << endl;
+   cout << "Usage: CNChatRoom <-Server ipAddress> <-Port port>" << endl;
 }
 
 static void
@@ -35,8 +33,6 @@ myexit()
 int
 main(int argc, char** argv)
 {
-   myUsage.reset();
-
    ifstream dof;
 
    if (argc == 3) {  // -file <doFile>
@@ -56,7 +52,7 @@ main(int argc, char** argv)
       myexit();
    }
 
-   if (!initCommonCmd() || !initCirCmd())
+   if (!initCommonCmd() || !initClientCmd())
       return 1;
 
    CmdExecStatus status = CMD_EXEC_DONE;

@@ -14,8 +14,8 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
-#include "rnGen.h"
-#include "myUsage.h"
+// #include "rnGen.h"
+// #include "myUsage.h"
 
 using namespace std;
 
@@ -23,8 +23,8 @@ using namespace std;
 //    Global variables in util
 //----------------------------------------------------------------------
 
-RandomNumGen  rnGen(0);  // use random seed = 0
-MyUsage       myUsage;
+// RandomNumGen  rnGen(0);  // use random seed = 0
+// MyUsage       myUsage;
 
 
 //----------------------------------------------------------------------
@@ -56,6 +56,7 @@ int listDir
    return 0;
 }
 
+/*
 size_t getHashSize(size_t s) {
    if (s < 8) return 7;
    if (s < 16) return 13;
@@ -75,4 +76,4 @@ size_t getHashSize(size_t s) {
    if (s < 536870912) return 5000011;
    return 7000003;
 }
-
+*/
