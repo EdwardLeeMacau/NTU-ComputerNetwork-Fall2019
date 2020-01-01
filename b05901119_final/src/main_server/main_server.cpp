@@ -1,5 +1,5 @@
 /****************************************************************************
-  FileName     [ main_client.cpp ]
+  FileName     [ main_server.cpp ]
   PackageName  [ main ]
   Synopsis     [ Define main() ]
 ****************************************************************************/
@@ -12,10 +12,10 @@ using namespace std;
 //----------------------------------------------------------------------
 //    Global cmd Manager
 //----------------------------------------------------------------------
-CmdParser* cmdMgr = new CmdParser("CNChatRoom");
+CmdParser* cmdMgr = new CmdParser("ChatRoom Server");
 
 extern bool initCommonCmd();
-extern bool initClientCmd();
+extern bool initServerCmd();
 
 static void
 usage()
@@ -33,6 +33,8 @@ myexit()
 int
 main(int argc, char** argv)
 {
+   myUsage.reset();
+
    ifstream dof;
 
    if (argc == 3) {  // -file <doFile>
@@ -52,7 +54,7 @@ main(int argc, char** argv)
       myexit();
    }
 
-   if (!initCommonCmd() || !initClientCmd())
+   if (!initCommonCmd() || !initServerCmd())
       return 1;
 
    CmdExecStatus status = CMD_EXEC_DONE;

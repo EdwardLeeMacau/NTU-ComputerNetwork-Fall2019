@@ -1,5 +1,5 @@
 PKGFLAG   =
-EXTHDRS   = util.h
+EXTHDRS   = util.h myUsage.h
 
 include ../Makefile.in
 include ../Makefile.lib

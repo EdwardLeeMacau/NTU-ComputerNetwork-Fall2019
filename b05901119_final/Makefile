@@ -1,7 +1,8 @@
 REFPKGS = cmd
-SRCPKGS = util sha256
+SRCPKGS = util sha256 client server
 LIBPKGS = $(REFPKGS) $(SRCPKGS)
-MAIN    = client server
+MAIN    = main
+
 EXEC    = client server
 
 LIBS    = $(addprefix -l, $(LIBPKGS))
@@ -20,16 +21,14 @@ libs:
 		cd ../..; \
 	done
 
-main: $(MAIN)
-
-client server:
+main: 
 	@for exec in $(EXEC); \
 	do \
-		@echo "Checking $$exec... "; \
-		@cd src/$$pkg; \
-			make -f make.$$pkg --no-print-directory INCLIB="$(LIBS)" EXEC=$$pkg; \
-		@cd ../..; \
-		@ln -fs bin/$$pkg \
+		echo "Checking main_$$exec... "; \
+		cd src/main_$$exec; \
+			make -f make.$$exec --no-print-directory INCLIB="$(LIBS)" EXEC=$$exec; \
+		cd ../..; \
+		ln -fs bin/$$exec; \
 	done
 
 rc:
@@ -54,7 +53,7 @@ clean:
 	@cd lib; rm -f $(SRCLIBS); cd ../
 	@for exec in $(EXEC); \
 	do \
-		echo "Removing $$exec..."; \
+		echo "Removing main_$$exec..."; \
 		rm -f bin/$$exec $$exec; \
 	done
 

@@ -11,13 +11,13 @@
 #include <istream>
 #include <vector>
 // #include "rnGen.h"
-// #include "myUsage.h"
+#include "myUsage.h"
 
 using namespace std;
 
 // Extern global variable defined in util.cpp
 // extern RandomNumGen  rnGen;
-// extern MyUsage       myUsage;
+MyUsage       myUsage;
 
 // In myString.cpp
 extern int myStrNCmp(const string& s1, const string& s2, unsigned n);
