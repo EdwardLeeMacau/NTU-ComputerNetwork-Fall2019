@@ -1,7 +1,15 @@
-#include "include_all.h"
+#include <fcntl.h>
 #include <unordered_map>
 #include <server.h>
-
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <dirent.h>
+#include <netdb.h>
 
 using namespace std;
 

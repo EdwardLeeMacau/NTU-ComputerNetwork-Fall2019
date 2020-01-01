@@ -1,1 +1,3 @@
-server.o: server.cpp ../../include/server/server.h
+server_cmd.o: server_cmd.cpp server_cmd.h ../../include/cmdParser.h \
+  ../../include/cmdCharDef.h
+server.o: server.cpp server.h

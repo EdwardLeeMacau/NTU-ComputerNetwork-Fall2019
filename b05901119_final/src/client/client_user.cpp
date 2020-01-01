@@ -1,4 +1,3 @@
-#include "client_user.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -11,6 +10,8 @@
 #include <vector>
 #include <dirent.h> 
 #include <iostream>
+
+#include "client.h"
 
 using namespace std;
 

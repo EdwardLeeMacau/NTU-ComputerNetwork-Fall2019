@@ -1,8 +1,15 @@
-#include "include_all.h"
+#include <netdb.h>
+#include <iostream>
+#include <fcntl.h>
 #include <string>
+#include <stdio.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include "client_server.h"
+#include <sys/poll.h>
+#include <errno.h>
+
+#include "client.h"
 
 using namespace std;
 

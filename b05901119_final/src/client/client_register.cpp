@@ -3,7 +3,8 @@
 #include <ctype.h>
 #include <tuple>
 #include <string.h>
-#include "client_register.h"
+#include <sys/socket.h>
+#include "client.h"
 
 using namespace std;
 
@@ -31,10 +32,10 @@ get_str(string getwhat)
 		len--;
 		bool valid_name = true;
 		
-		if (len > 16) 
-			{printf("Name too long (Max 16 characters!)\n"); continue;} 
-		if (len == 0) 
-			{printf("Can't be empty!\n"); continue;}
+		if ( len > 16 ) 
+			{ printf("Name too long (Max 16 characters!)\n"); continue; } 
+		if ( len == 0 ) 
+			{ printf("Can't be empty!\n"); continue; }
 		
 		for (int i = 0; i < len; i++) {
 			if (!(isalpha(name[i]) || name[i] == '_')) {

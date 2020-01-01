@@ -4,10 +4,10 @@
   Synopsis     [  ]
 ****************************************************************************/
 
-#include "include_all.h"
-#include "client_register.h"
-#include "client_server.h"
-#include "client_user.h"
+#include "unistd.h"
+#include <sys/stat.h>
+#include <poll.h>
+#include <iostream>
 #include "client.h"
 
 using namespace std;
