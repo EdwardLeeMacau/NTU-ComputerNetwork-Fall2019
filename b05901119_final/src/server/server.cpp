@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 #include <dirent.h>
 #include <netdb.h>
 
