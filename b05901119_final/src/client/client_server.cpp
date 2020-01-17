@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <sys/poll.h>
 #include <errno.h>
+#include <cstring>
 
 #include "client.h"
 
