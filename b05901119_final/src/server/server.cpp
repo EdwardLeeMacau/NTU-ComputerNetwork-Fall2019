@@ -12,6 +12,9 @@
 #include <dirent.h>
 #include <netdb.h>
 
+#include "server.h"
+#include "sha256.h"
+
 using namespace std;
 
 char *login_file_path = "config.txt";
@@ -92,12 +95,7 @@ getfilelist(string file_path)
 	return filelist;
 }
 
-/*
-	TODO: Return bool
-	
-	@return bool True if 
-*/
-int 
+bool
 CheckFileExist(string file_path, string filename)
 {
 	struct dirent **namelist;
@@ -565,8 +563,8 @@ start_connect(void* sockfd)
 					// if username exists
 					// username and password match
 					// cout << "actual password: " << username_to_psd[usernamestring] << endl;
-					cout << "requested password: " << passwordstring << endl;
-					if(username_to_psd[usernamestring] == passwordstring)
+					cout << "requested password: " << sha256(passwordstring) << endl;
+					if(username_to_psd[usernamestring] == sha256(passwordstring))
 					{
 						login = 1;
 						send(clientsockfd, succeed, strlen(succeed), 0);
@@ -615,7 +613,7 @@ start_connect(void* sockfd)
 				{
 					//store username/password in file
 					send(clientsockfd, succeed, strlen(succeed), 0);
-					username_to_psd[usernamestring] = passwordstring;
+					username_to_psd[usernamestring] = sha256(passwordstring);
 					userlist += usernamestring;
 					userlist += "\n";
 
