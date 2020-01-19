@@ -11,8 +11,11 @@ SRCLIBS = $(addsuffix .a, $(addprefix lib, $(SRCPKGS)))
 PORT    = 19798
 SERV_IP = 127.0.0.1
 
-all: libs main
+all: bin libs main
 	
+bin:
+	mkdir bin
+
 libs:
 	@for pkg in $(SRCPKGS); \
 	do \
