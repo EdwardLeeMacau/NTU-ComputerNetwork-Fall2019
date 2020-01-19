@@ -10,5 +10,4 @@ target: $(TARGET)
 
 $(TARGET): $(COBJS) $(LIBDEPEND)
 	@echo "> building main_$(EXEC)..."
-	@$(CXX) $(CFLAGS) -I$(EXTINCDIR) $(COBJS) -L$(LIBDIR) $(INCLIB) -o $@
-
+	@$(CXX) $(CFLAGS) -I$(EXTINCDIR) $(COBJS) -L$(LIBDIR) $(INCLIB) -lpthread -o $@
