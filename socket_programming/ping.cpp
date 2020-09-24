@@ -5,26 +5,18 @@
 
   Usage: ./ping [-n number] [-t timeout] host_1:port_1 host_2:port_2 ...
 ****************************************************************************/
-#include <arpa/inet.h>
-#include <iomanip>
+#include "ping.h"
+
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
-
 
 using namespace std;
 
 typedef pair<string, string> Host;
 
 void 
-ping (int& sockfd, const addrinfo* res, const string& msg, char receivemsg[], const int& timeout) 
+ping(int& sockfd, const addrinfo* res, const string& msg, char receivemsg[], const int& timeout) 
 {
 			
 	sockaddr_in* saddr = (sockaddr_in*) res->ai_addr;
@@ -51,135 +43,102 @@ ping (int& sockfd, const addrinfo* res, const string& msg, char receivemsg[], co
     }
 }
 
-int 
-main(int argc, char *argv[])
+
+void
+init_opt(OPT_S& opt)
 {
-	clock_t mainstart = clock();
+	opt.targets = 0;
+	opt.numbers = -1;
+	opt.timeout = -1;
+}
+
+void 
+usage()
+{
+	cout << "Usage: ./ping [-n number] [-t timeout] host_1:port_1 host_2:port_2 ..." << endl
+		 << "    -n number		The number of packets to send, default 0" 			 << endl
+		 << "    -t timeout		Set timeout value, default -1" 						 << endl;
+}
+
+
+/**
+ * @brief the argument parser of main program
+ * 
+ * @param[out] opt Options
+ * @param[in] argc
+ * @param[in] argv
+ * @param[out] res array of res
+ * @param[out] hints 
+ */
+PARSE_OPT_STATUS
+parse(OPT_S& opt, int argc, char** argv, addrinfo** res, addrinfo& hints)
+{
 	string host;
 	string ips[argc];					// Container to parsed IP Address 
 	string ports[argc];					// Container to parsed Port
-	string msg = "ping";				// Msg send to Server.
-	int targets = 0;					// Count of Target Hosts
-	char receivemsg[100];				// Buffer for receiving response
-	int timeout = -1;				    // Timeout
-	int number = -1;					// Number
-	
+
 	// Argument Parser
     for (int i = 1; i < argc; ++i) {
         if ((string)argv[i] == "-t") {
-            if (timeout == -1 && i < argc - 1) {
-                timeout = atoi(argv[++i]);
-				if (timeout < 0){
-					cerr << "Value Error: -t should equal or larger that 0, find " << timeout << endl; 
-					return -1;
-				}
+            if (opt.timeout == -1 && i < argc - 1) {
+                opt.timeout = atoi(argv[++i]);
 			} else if (i < argc - 1) {
                 cerr << "Argument Error: Repeat -t" << endl;
-                return -1;
-			} else {
-				cerr << "Usage: ./ping [-n number] [-t timeout] host_1:port_1 host_2:port_2 ..." << endl;
+				usage();
+                return PARSE_REPEATED_FLAG;
+			} else if (opt.timeout == -1) {
+				cerr << "Argument Error: [-t timeout]" << endl;
+				usage();
+				return PARSE_INVAILD_TIMEOUT;
 			}
+			if (opt.timeout < 0){
+				cerr << "Value Error: -t should equal or larger that 0, find " << opt.timeout << endl; 
+				return PARSE_INVAILD_TIMEOUT;
+			}
+
         } else if ((string)argv[i] == "-n") {
-            if (number == -1 && i < argc - 1) {
-				number = atoi(argv[++i]);
-				if (number < 0){
-					cerr << "Value Error: -n should equal or larger that 0, find " << number << endl; 
-					return -1;
+            if (opt.numbers == -1 && i < argc - 1) {
+				opt.numbers = atoi(argv[++i]);
+				if (opt.numbers < 0){
+					cerr << "Value Error: -n should equal or larger that 0, find " << opt.numbers << endl; 
+					return PARSE_INVAILD_NUM;
 				}
 			}
 			else if (i < argc - 1) {
 				cerr << "Argument Error: Repeat -n" << endl;
-				return -1;
+				return PARSE_REPEATED_FLAG;
 			} else {
-				cerr << "Usage: ./ping [-n number] [-t timeout] host_1:port_1 host_2:port_2 ..." << endl;
+				usage();
 			}
         } else {
 			// Find IPAddress and Port
 			host = (string)argv[i];
 
 			if (host.find(':') == string::npos) {
-				cerr << "Please specify port number, host_1:port_1 host_2:port_2 ..." << endl;
-				return -1;
-			} else {
-				ips[targets]   = host.substr(0, host.find(':'));
-				ports[targets] = host.substr(host.find(':') + 1);
-			}
+				cout << "Please specify port number." << endl;
+				usage();
+				return PARSE_INVAILD_HOST;
+			} 
 
-			++targets;
+			ips[opt.targets]   = host.substr(0, host.find(':'));
+			ports[opt.targets] = host.substr(host.find(':') + 1);
+			++opt.targets;
         }
     }
 
 	// If no targets
-	if (targets == 0) {
-		cerr << "Usage: ./ping [-n number] [-t timeout] host_1:port_1 host_2:port_2 ..." << endl;
-		return -1;
+	if (opt.targets == 0) {
+		cout << "Please specify host." << endl;
+		usage();
+		return PARSE_NO_HOST;
 	}
-	
-	// Default Arugments
-	if (number == -1)	number = 0;
-	if (timeout == -1)	timeout = 1000;
 
-	int sockfd[targets];					// File Descriptor
-	addrinfo *res[targets];					// Result of DNS and Service Query
-	addrinfo hints;							// 
-	memset(&hints, 0, sizeof(hints));		// Make sure hints is empty
-	hints.ai_family   = AF_UNSPEC;			// IPV4 or IPV6
-	hints.ai_socktype = SOCK_STREAM;		// TCP Stream Socket
-	hints.ai_flags    = AI_PASSIVE;			// My IP Address
-	
-	if(number != 0)
-	{
-		for(int i = 0; i < targets; i++) {
-			// getaddrinfo()
-			if (getaddrinfo(ips[i].c_str(), ports[i].c_str(), &hints, &res[i]))	{
-				cerr << "Get Address Info Error (" << ips[i] << ":" << ports[i] << ")" << endl;
-				continue;
-			}
-			
-			sockfd[i] = socket(res[i]->ai_family, res[i]->ai_socktype,  res[i]->ai_protocol);
-			
-			if (connect(sockfd[i], res[i]->ai_addr, res[i]->ai_addrlen)) {
-				cerr << "Connection failed. " << endl;
-				continue;
-			}
-
-			for(int j = 0; j < number; j++) {
-				ping(sockfd[i], res[i], msg, receivemsg, timeout);
-			}
-
-			close(sockfd[i]);
+	for (int i = 0; i < opt.targets; i++) {
+		if (getaddrinfo(ips[i].c_str(), ports[i].c_str(), &hints, &res[i]))	{
+			cerr << "Get Address Info Error (" << ips[i] << ":" << ports[i] << ")" << endl;
+			continue;
 		}
-	} else {
-		bool status[targets];
-		for(int i = 0; i < targets; i++)
-			status[i] = false;
+	}
 
-		for(int i = 0; i < targets; i++) {	
-			if (getaddrinfo(ips[i].c_str(), ports[i].c_str(), &hints, &res[i])) {
-				cerr << "Get Address Info Error (" << ips[i] << ":" << ports[i] << ")" << endl;
-				continue;
-			}
-
-			status[i] = true;
-			sockfd[i] = socket(res[i]->ai_family, res[i]->ai_socktype,  res[i]->ai_protocol);
-
-			if (connect(sockfd[i], res[i]->ai_addr, res[i]->ai_addrlen)) {
-				cerr << "Connect to " << ips[i] << ":" << ports[i] << " failed. " << endl;
-				continue;
-			}
-		}
-		
-		while(true) {
-			for(int i = 0; i < targets; i++) {
-				if (status[i])
-					ping(sockfd[i], res[i], msg, receivemsg, timeout);
-			}
-		}
-		
-		for (int i = 0; i < targets; ++i){
-			close(sockfd[i]);
-		}
-    }
-
-    return EXIT_SUCCESS;
+	return PARSE_SUCCESS;
 }

@@ -6,6 +6,8 @@
   Usage: ./server <listen_port>
 ****************************************************************************/
 
+#include "server.h"
+
 #include <arpa/inet.h>
 #include <iostream>
 #include <netinet/in.h>
