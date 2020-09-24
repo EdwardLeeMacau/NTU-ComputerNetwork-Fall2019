@@ -6,7 +6,7 @@ CFLAGS = -g -Wall -std=c++11
 # INCLUDE LIBRARY
 EXTINC = . ../../googletest/googletest/include
 EXTLIB = ../../googletest/build/lib
-LIBS = gtest pthread
+LIBS = gtestd pthread
 
 # UNITTEST
 TESTCASES = $(shell find . -name 'test_*.cpp')
@@ -40,4 +40,4 @@ clean:
 
 %.o: %.cpp
 	@echo "> Compiling $^..."
-	@g++ $(CFLAGS) -c $^ 
+	@g++ $(CFLAGS) $(addprefix -I, $(EXTINC)) -c $^ 
